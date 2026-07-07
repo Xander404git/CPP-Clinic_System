@@ -1,0 +1,8 @@
+# Build output
+obj/
+*.exe
+
+# IDE and cache files
+.vscode/
+.cache/
+compile_commands.json
