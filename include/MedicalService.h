@@ -38,6 +38,8 @@ public:
                    bool refRequired = false);
 
     // Rule of Three to properly track instances
+    // Reference: Rule of Three - copy constructor, copy assignment, destructor
+    // https://en.cppreference.com/w/cpp/language/rule_of_three
     MedicalService(const MedicalService& other);
     MedicalService& operator=(const MedicalService& other);
     ~MedicalService();

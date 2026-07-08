@@ -9,6 +9,7 @@
 int AppointmentRecord::idCounter = 1000;
 
 // ----- ID generator -----
+// Generate unique appointment ID by incrementing a static counter
 std::string AppointmentRecord::generateId() {
     std::ostringstream oss;
     oss << "APT" << (++idCounter);
@@ -16,6 +17,7 @@ std::string AppointmentRecord::generateId() {
 }
 
 // Helper: current date-time string
+// Return the current system date and time formatted as a string
 static std::string currentDateTime() {
     std::time_t now = std::time(nullptr);
     char buf[20];
@@ -24,6 +26,7 @@ static std::string currentDateTime() {
 }
 
 // ----- Constructors -----
+// Default constructor configuring initial state for an empty appointment
 AppointmentRecord::AppointmentRecord()
     : service(), appointmentStatus("Scheduled"),
       apptType(AppointmentType::REGULAR), insuranceTier(InsuranceTier::NONE)
@@ -32,6 +35,7 @@ AppointmentRecord::AppointmentRecord()
     dateTime      = currentDateTime();
 }
 
+// Parameterized constructor populating details and setting scheduled status
 AppointmentRecord::AppointmentRecord(const MedicalService& svc,
                                      const std::string& docId,
                                      AppointmentType type,
@@ -66,6 +70,7 @@ void AppointmentRecord::setIdCounter(int n)                    { idCounter = n; 
 
 // ----- Billing calculation -----
 // Base fee → apply type modifier → apply insurance discount
+// Calculate total cost considering base fee, modifiers, and insurance discounts
 double AppointmentRecord::calculateTotalBilling() const {
     double total = service.getBaseFee();
 
@@ -84,13 +89,14 @@ double AppointmentRecord::calculateTotalBilling() const {
         default: break;
     }
 
-    // Cancelled or Paid appointments – no charge
+    // Do not charge for cancelled or fully paid appointments
     if (appointmentStatus == "Cancelled" || appointmentStatus == "Paid") return 0.0;
 
     return total;
 }
 
 // ----- String helpers -----
+// Convert insurance tier enum value to human-readable string
 std::string AppointmentRecord::tierToString(InsuranceTier t) {
     switch (t) {
         case InsuranceTier::NONE:     return "None";
@@ -101,6 +107,7 @@ std::string AppointmentRecord::tierToString(InsuranceTier t) {
     }
 }
 
+// Convert appointment type enum value to human-readable string
 std::string AppointmentRecord::typeToString(AppointmentType t) {
     switch (t) {
         case AppointmentType::REGULAR:    return "Regular";
@@ -111,6 +118,7 @@ std::string AppointmentRecord::typeToString(AppointmentType t) {
 }
 
 // ----- Display -----
+// Print formatted box containing all appointment details
 void AppointmentRecord::displayRecord() const {
     std::cout << std::fixed << std::setprecision(2);
     std::cout << "  +---------------------------------------------+\n";

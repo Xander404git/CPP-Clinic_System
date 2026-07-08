@@ -20,6 +20,8 @@
 // ============================================================
 
 // Custom exceptions
+// Reference: Custom exception classes inheriting from std::exception
+// https://en.cppreference.com/w/cpp/error/exception
 class HospitalException : public std::exception {
     std::string msg;
 public:
@@ -54,9 +56,13 @@ struct DoctorAppointmentInfo {
 class HospitalSystem {
 private:
     // Polymorphic container – stores both Patient and Doctor via base pointer
+    // Reference: Using std::unique_ptr for polymorphic containers
+    // https://en.cppreference.com/w/cpp/memory/unique_ptr
     std::vector<std::unique_ptr<Person>> users;
 
     // O(1) lookup for medical services by code
+    // Reference: std::unordered_map for O(1) average lookup
+    // https://en.cppreference.com/w/cpp/container/unordered_map
     std::unordered_map<std::string, MedicalService> servicesMap;
 
     std::string hospitalName;

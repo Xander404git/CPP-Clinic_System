@@ -18,10 +18,14 @@ namespace Input {
     // Clears the input buffer to prevent infinite loops on bad input
     inline void clearBuffer() {
         std::cin.clear();
+        // Reference: std::numeric_limits for clearing input buffer
+        // https://en.cppreference.com/w/cpp/types/numeric_limits
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
     // Generic template function for validated input
+    // Reference: Function templates and template specialization
+    // https://en.cppreference.com/w/cpp/language/function_template
     template <typename T>
     T getValidInput(const std::string& prompt, 
                     std::function<bool(const T&)> validator = [](const T&) { return true; }, 

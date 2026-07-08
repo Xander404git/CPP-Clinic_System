@@ -11,6 +11,7 @@ int Patient::patientCount      = 0;
 int Patient::nextPatientNumber = 1000;
 
 // ----- Constructors -----
+// Initialize default patient attributes and increment counter
 Patient::Patient()
     : Person(), insuranceProvider("None"), insurancePolicyNumber(""),
       insuranceTier(InsuranceTier::NONE), bloodType("Unknown")
@@ -18,6 +19,7 @@ Patient::Patient()
     ++patientCount;
 }
 
+// Parameterized constructor initializing base Person and specific Patient attributes
 Patient::Patient(const std::string& id,
                  const std::string& name,
                  const std::string& contact,
@@ -40,6 +42,7 @@ Patient::~Patient() {
 }
 
 // ----- Pure virtual override -----
+// Display detailed patient record and billing summary
 void Patient::displayRole() const {
     Person::printDivider('-', 55);
     std::cout << "  [PATIENT RECORD]\n";
@@ -49,6 +52,7 @@ void Patient::displayRole() const {
     std::cout << "  Insurance   : " << insuranceProvider
               << " (" << AppointmentRecord::tierToString(insuranceTier) << ")\n";
     std::cout << "  Policy No.  : " << insurancePolicyNumber << "\n";
+    // Print a comma-separated list of allergies if any exist
     if (!allergies.empty()) {
         std::cout << "  Allergies   : ";
         for (size_t i = 0; i < allergies.size(); ++i)
@@ -70,6 +74,7 @@ void Patient::displayRole() const {
 std::string Patient::getType() const { return "Patient"; }
 
 // ----- Appointment management -----
+// Create a new appointment and append it to the patient's record
 void Patient::scheduleAppointment(const MedicalService& s,
                                   const std::string& doctorId,
                                   const std::string& dateTime,
@@ -86,6 +91,7 @@ void Patient::addExistingAppointment(const AppointmentRecord& rec) {
     appointments.push_back(rec);
 }
 
+// Find specific appointment by ID and update its current status
 bool Patient::setAppointmentStatus(const std::string& apptId, const std::string& status) {
     for (auto& rec : appointments) {
         if (rec.getAppointmentId() == apptId) {
@@ -101,6 +107,7 @@ bool Patient::cancelAppointment(const std::string& apptId) {
 }
 
 // ----- Aggregation cleanup -----
+// Clear doctor references from all appointments without deleting the records
 void Patient::clearDoctorFromAppointments(const std::string& doctorId) {
     for (auto& rec : appointments) {
         if (rec.getDoctorId() == doctorId) {
@@ -116,6 +123,7 @@ void Patient::addAllergy(const std::string& allergy) {
 }
 
 // ----- Financial -----
+// Sum up total expenses for all associated appointments
 double Patient::calculateTotalMedicalExpenses() const {
     double total = 0.0;
     for (const auto& rec : appointments)
@@ -123,6 +131,7 @@ double Patient::calculateTotalMedicalExpenses() const {
     return total;
 }
 
+// Calculate total expenses specifically for completed appointments
 double Patient::calculateOutstandingBalance() const {
     double total = 0.0;
     for (const auto& rec : appointments)
@@ -142,6 +151,7 @@ const std::vector<std::string>& Patient::getAllergies() const { return allergies
 // ----- Static -----
 int Patient::getPatientCount() { return patientCount; }
 
+// Generate a unique patient ID string using an auto-incrementing counter
 std::string Patient::generatePatientId() {
     std::ostringstream oss;
     oss << "PAT" << (++nextPatientNumber);

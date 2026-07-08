@@ -34,9 +34,13 @@ public:
            const std::string& gender);
 
     // ----- Virtual Destructor (mandatory for polymorphic base) -----
+    // Reference: Virtual destructors for polymorphic base classes
+    // https://en.cppreference.com/w/cpp/language/destructor#Virtual_destructors
     virtual ~Person();
 
     // ----- Pure Virtual Function (makes this class abstract) -----
+    // Reference: Pure virtual functions and abstract classes
+    // https://en.cppreference.com/w/cpp/language/abstract_class
     virtual void displayRole() const = 0;
 
     // ----- Virtual functions with default implementation -----

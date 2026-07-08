@@ -16,6 +16,7 @@ HospitalSystem::~HospitalSystem() {
 
 // Internal helpers
 bool HospitalSystem::idExists(const std::string &id) const {
+  // Check if a user with the given ID already exists
   for (const auto &ptr : users) {
     const Person *p = ptr.get();
     if (p->getId() == id)
@@ -25,15 +26,19 @@ bool HospitalSystem::idExists(const std::string &id) const {
 }
 
 Patient *HospitalSystem::findPatient(const std::string &id) {
+  // Search for a patient by ID and return a pointer if found
   for (const auto &ptr : users) {
     Person *p = ptr.get();
     if (p->getId() == id && p->getType() == "Patient")
+      // Reference: dynamic_cast for safe downcasting in polymorphic hierarchies
+      // https://en.cppreference.com/w/cpp/language/dynamic_cast
       return dynamic_cast<Patient *>(p);
   }
   return nullptr;
 }
 
 Doctor *HospitalSystem::findDoctor(const std::string &id) {
+  // Search for a doctor by ID and return a pointer if found
   for (const auto &ptr : users) {
     Person *p = ptr.get();
     if (p->getId() == id && p->getType() == "Doctor")
@@ -128,6 +133,7 @@ HospitalSystem::checkServiceRemovable(const std::string &serviceCode) const {
   if (!servicesMap.count(serviceCode))
     return "";
 
+  // Verify if any active patient appointments are using this service
   for (const auto &ptr : users) {
     const Person *p = ptr.get();
     if (p->getType() == "Patient") {
@@ -216,6 +222,7 @@ void HospitalSystem::setAppointmentStatus(const std::string &patientId,
   // Find the appointment's doctor ID before changing status
   std::string doctorId;
   std::string oldStatus;
+  // Iterate through patient appointments to find current doctor and status
   for (const auto &rec : patient->getAppointments()) {
     if (rec.getAppointmentId() == apptId) {
       doctorId = rec.getDoctorId();
@@ -300,6 +307,7 @@ void HospitalSystem::viewAllUsers() const {
   Person::printCentred("ALL REGISTERED USERS", 55);
   std::cout << "  Total: " << users.size() << " user(s)\n";
   Person::printDivider('=', 55);
+  // Iterate through all users and call their respective display role functions
   for (const auto &ptr : users) {
     const Person *p = ptr.get();
     p->displayRole();
@@ -312,6 +320,7 @@ void HospitalSystem::viewAllPatients() const {
   Person::printCentred("ALL PATIENTS", 55);
   Person::printDivider('=', 55);
   int count = 0;
+  // Iterate through all users to find and display those who are patients
   for (const auto &ptr : users) {
     const Person *p = ptr.get();
     if (p->getType() == "Patient") {
@@ -328,6 +337,7 @@ void HospitalSystem::viewAllDoctors() const {
   Person::printCentred("ALL DOCTORS", 55);
   Person::printDivider('=', 55);
   int count = 0;
+  // Iterate through all users to find and display those who are doctors
   for (const auto &ptr : users) {
     const Person *p = ptr.get();
     if (p->getType() == "Doctor") {
@@ -342,6 +352,7 @@ void HospitalSystem::viewAllDoctors() const {
 // Billing report
 void HospitalSystem::generateBillingReport(const std::string &patientId) const {
   // const version: use const_cast to call findPatient via loop
+  // Search for the specific patient and display their billing history
   for (const auto &ptr : users) {
     const Person *p = ptr.get();
     if (p->getId() == patientId && p->getType() == "Patient") {
@@ -367,6 +378,8 @@ void HospitalSystem::generateSystemSummary() const {
 }
 
 // File persistence
+// Reference: File I/O using std::ofstream and std::ifstream
+// https://en.cppreference.com/w/cpp/header/fstream
 void HospitalSystem::saveToFile(const std::string &filename) const {
   std::ofstream ofs(filename);
   if (!ofs.is_open())
@@ -374,6 +387,7 @@ void HospitalSystem::saveToFile(const std::string &filename) const {
 
   // Write services
   ofs << "[SERVICES]\n";
+  // Iterate over all medical services to save their details
   for (const auto &kv : servicesMap) {
     const MedicalService &s = kv.second;
     ofs << s.getServiceCode() << "|" << s.getServiceName() << "|"
@@ -445,6 +459,8 @@ void HospitalSystem::saveToFile(const std::string &filename) const {
   std::cout << "  [OK] Data saved to '" << filename << "'.\n";
 }
 
+// Reference: File I/O using std::ofstream and std::ifstream
+// https://en.cppreference.com/w/cpp/header/fstream
 void HospitalSystem::loadFromFile(const std::string &filename) {
   std::ifstream ifs(filename);
   if (!ifs.is_open())
@@ -458,6 +474,9 @@ void HospitalSystem::loadFromFile(const std::string &filename) {
   std::string section = "";
 
   // Helper to split string by delimiter
+  // Reference: Splitting strings using std::istringstream and std::getline
+  // https://en.cppreference.com/w/cpp/io/basic_istringstream
+  // https://stackoverflow.com/questions/236129/how-do-i-iterate-over-the-words-of-a-string
   auto split = [](const std::string &s, char delimiter) {
     std::vector<std::string> tokens;
     std::string token;
@@ -470,6 +489,7 @@ void HospitalSystem::loadFromFile(const std::string &filename) {
     return tokens;
   };
 
+  // Read file line by line and parse data into corresponding objects
   while (std::getline(ifs, line)) {
     if (line.empty())
       continue;
@@ -550,6 +570,7 @@ void HospitalSystem::loadFromFile(const std::string &filename) {
 
   // Sync static ID counters to avoid collisions
   int maxPatNum = 1000, maxDocNum = 100, maxApptNum = 1000;
+  // Loop through all users to find maximum IDs and synchronize counters
   for (const auto &ptr : users) {
     const Person *p = ptr.get();
     std::string uid = p->getId();
@@ -608,6 +629,7 @@ int HospitalSystem::getServiceCount() const {
 // Doctor time-conflict check
 bool HospitalSystem::hasDoctorConflict(const std::string &doctorId,
                                        const std::string &dateTime) const {
+  // Check if the doctor already has an active appointment at the requested time
   for (const auto &ptr : users) {
     const Person *p = ptr.get();
     if (p->getType() == "Patient") {
@@ -629,6 +651,7 @@ bool HospitalSystem::hasDoctorConflict(const std::string &doctorId,
 std::vector<DoctorAppointmentInfo>
 HospitalSystem::checkDoctorRemovable(const std::string &doctorId) const {
   std::vector<DoctorAppointmentInfo> blockers;
+  // Collect all active appointments that block this doctor from being removed
   for (const auto &ptr : users) {
     const Person *p = ptr.get();
     if (p->getType() == "Patient") {
@@ -669,6 +692,7 @@ void HospitalSystem::reassignAppointmentDoctor(const std::string &patientId,
   // We need non-const access to appointments, so use setAppointmentStatus-style
   // loop But we need to change doctorID to use clearDoctorFromAppointments
   // selectively iterate via the Patient's methods
+  // Find the target appointment and update its assigned doctor
   for (auto &rec :
        const_cast<std::vector<AppointmentRecord> &>(pat->getAppointments())) {
     if (rec.getAppointmentId() == apptId) {
@@ -689,6 +713,7 @@ void HospitalSystem::reassignAppointmentDoctor(const std::string &patientId,
     Doctor *oldDoc = findDoctor(oldDoctorId);
     if (oldDoc) {
       bool hasOtherAppts = false;
+      // Check if the previous doctor still has other active appointments for this patient
       for (const auto &rec : pat->getAppointments()) {
         if (rec.getDoctorId() == oldDoctorId &&
             rec.getAppointmentId() != apptId &&

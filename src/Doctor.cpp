@@ -10,6 +10,7 @@ int Doctor::doctorCount      = 0;
 int Doctor::nextDoctorNumber = 100;
 
 // ----- Constructors -----
+// Initialize default doctor attributes and increment overall counter
 Doctor::Doctor()
     : Person(), specializationDepartment("General"), assignedClinicCode(""),
       licenseNumber(""), yearsOfExperience(0), consultationFee(0.0), patientsSeen(0)
@@ -17,6 +18,7 @@ Doctor::Doctor()
     ++doctorCount;
 }
 
+// Parameterized constructor initializing both Person and specific Doctor attributes
 Doctor::Doctor(const std::string& id,
                const std::string& name,
                const std::string& contact,
@@ -40,6 +42,7 @@ Doctor::~Doctor() {
 }
 
 // ----- Pure virtual override -----
+// Print detailed doctor information, qualifications, and patient stats
 void Doctor::displayRole() const {
     Person::printDivider('-', 55);
     std::cout << "  [DOCTOR RECORD]\n";
@@ -65,6 +68,7 @@ void Doctor::displayRole() const {
 std::string Doctor::getType() const { return "Doctor"; }
 
 // ----- Clinic management -----
+// Assign this doctor to a specific clinic by code
 void Doctor::assignToClinic(const std::string& clinicCode) {
     assignedClinicCode = clinicCode;
     std::cout << "  [OK] " << name << " assigned to clinic [" << clinicCode << "].\n";
@@ -74,6 +78,7 @@ void Doctor::addQualification(const std::string& qual) {
     qualifications.push_back(qual);
 }
 
+// Add patient ID to assigned list, avoiding duplicate entries
 void Doctor::addAssignedPatient(const std::string& patientId) {
     // Prevent duplicate entries – a patient should appear at most once
     if (std::find(assignedPatientIds.begin(), assignedPatientIds.end(), patientId)
@@ -82,6 +87,7 @@ void Doctor::addAssignedPatient(const std::string& patientId) {
     }
 }
 
+// Remove specific patient ID from the assigned list if it exists
 void Doctor::removeAssignedPatient(const std::string& patientId) {
     assignedPatientIds.erase(
         std::remove(assignedPatientIds.begin(), assignedPatientIds.end(), patientId),
@@ -107,6 +113,7 @@ void Doctor::setPatientsSeen(int n) { patientsSeen = n; }
 // ----- Static -----
 int Doctor::getDoctorCount() { return doctorCount; }
 
+// Generate a sequential unique doctor ID
 std::string Doctor::generateDoctorId() {
     std::ostringstream oss;
     oss << "DOC" << (++nextDoctorNumber);

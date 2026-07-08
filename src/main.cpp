@@ -43,6 +43,7 @@ static int getIntInput(const std::string& prompt, int lo = 0, int hi = 9999) {
         size_t start = 0;
         if (line[0] == '-') start = 1;
         if (start >= line.size()) valid = false;
+        // Iterate through all characters to verify they are digits
         for (size_t i = start; i < line.size() && valid; ++i) {
             if (!std::isdigit(static_cast<unsigned char>(line[i]))) {
                 valid = false;
@@ -120,6 +121,7 @@ static AppointmentType selectAppointmentType() {
               << "    2 - Emergency (+30% surcharge)\n"
               << "    3 - Follow-Up (-30% discount)\n";
     int ch = getIntInput("  Select type [1-3]: ", 1, 3);
+    // Map user choice to the corresponding AppointmentType enum
     switch (ch) {
         case 2: return AppointmentType::EMERGENCY;
         case 3: return AppointmentType::FOLLOW_UP;
@@ -299,6 +301,7 @@ static void handleAddService(HospitalSystem& hs) {
 static std::string selectUser(const HospitalSystem& hs, const std::string& typeFilter = "") {
     const auto& users = hs.getUsers();
     std::vector<const Person*> filtered;
+    // Filter users based on type if a type filter is provided
     for (const auto& u : users) {
         if (typeFilter.empty() || u->getType() == typeFilter) {
             filtered.push_back(u.get());
@@ -321,6 +324,7 @@ static std::string selectService(const HospitalSystem& hs, bool checkRemovable =
 
     std::vector<std::string> codes;
     int idx = 1;
+    // Display all available services and optionally check if they can be removed
     for (const auto& kv : services) {
         codes.push_back(kv.first);
         std::cout << "  [" << idx++ << "] " << kv.first << " (" << kv.second.getServiceName() << ")";
@@ -342,6 +346,7 @@ static std::string selectPatientAppointment(const Patient* p) {
 
     std::vector<std::string> ids;
     int idx = 1;
+    // Iterate through all patient appointments to display as options
     for (const auto& rec : appts) {
         ids.push_back(rec.getAppointmentId());
         std::cout << "  [" << idx++ << "] " << rec.getAppointmentId()
@@ -405,6 +410,7 @@ static void handleSetStatus(HospitalSystem& hs) {
     std::cout << "\n  -- Select Appointment --\n";
     std::string apptId;
     const auto& users = hs.getUsers();
+    // Find the selected patient to get their appointments
     for (const auto& ptr : users) {
         const Person* p = ptr.get();
         if (p->getId() == pid) {
@@ -455,6 +461,7 @@ static void handleUpcomingAppointments(HospitalSystem& hs) {
         int count = 1;
         
         const auto& users = hs.getUsers();
+        // Loop through all users to find patients and their scheduled appointments
         for (const auto& ptr : users) {
             const Person* p = ptr.get();
             if (p->getType() == "Patient") {
@@ -615,6 +622,7 @@ static void seedDemoData(HospitalSystem& hs) {
 
     // Mark some as completed
     const auto& users = hs.getUsers();
+    // Find the first patient and mark their first appointment as completed
     for (const auto& ptr : users) {
         if (ptr->getId() == id_p1) {
             const Patient* pat = dynamic_cast<const Patient*>(ptr.get());
@@ -696,6 +704,7 @@ int main() {
                     // Determine if this user is a Doctor with active appointments
                     const auto& allUsers = hs.getUsers();
                     std::string userType, userName;
+                    // Find the user to determine their type and name
                     for (const auto& ptr : allUsers) {
                         const Person* p = ptr.get();
                         if (p->getId() == uid) {
@@ -731,6 +740,7 @@ int main() {
 
                             // Reassign each blocking appointment
                             bool aborted = false;
+                            // Reassign each blocking appointment to a new doctor
                             for (const auto& info : blockers) {
                                 Person::printDivider('-', 55);
                                 std::cout << "  CALL " << info.patientName

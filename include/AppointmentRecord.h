@@ -11,6 +11,8 @@
 // Manages billing modifiers (insurance tier, emergency surcharge, etc.)
 // ============================================================
 
+// Reference: Scoped enumerations (enum class) for type safety
+// https://en.cppreference.com/w/cpp/language/enum
 enum class InsuranceTier { NONE, BASIC, STANDARD, PREMIUM };
 enum class AppointmentType { REGULAR, EMERGENCY, FOLLOW_UP };
 
